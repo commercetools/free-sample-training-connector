@@ -2,6 +2,8 @@ import { ByProjectKeyRequestBuilder } from '@commercetools/platform-sdk/dist/dec
 import { readConfiguration } from '../utils/config.utils';
 import { ApiRoot, Channel } from '@commercetools/platform-sdk';
 import { createApiRoot } from '../client/create.client';
+import { channel } from 'diagnostics_channel';
+import { response } from 'express';
 
 
 const CART_UPDATE_EXTENSION_KEY = 'free-sample-cartUpdateExtension';
@@ -9,13 +11,16 @@ const CART_DISCOUNT_TYPE_KEY = 'myconnector-cartDiscountType';
 
   
 
-export async function createChannel(
-  // apiRoot: ByProjectKeyRequestBuilder
-): Promise<string> {
+export async function createChannelAndInventory(
+  apiRoot: ByProjectKeyRequestBuilder
+): Promise<void> {
 
   const freeSampleChannelKey:string = readConfiguration().freeSampleChannel;
+  const freeSampleSku:string = readConfiguration().freeSampleSku;
+  const freeSampleQuantity: number = readConfiguration().freeSampleQuantity;
+  const freeSampleInventoryKey = "free-sample-" + freeSampleSku;
   let channel: Channel;
-  let apiRoot = createApiRoot();
+  
   const {
     body: { results: channels },
   } = await apiRoot
@@ -43,16 +48,6 @@ export async function createChannel(
       })
       .execute().then(channel => channel.body);
   }
-  return channel.id;
-}
-
-export async function addInventory(
-  apiRoot: ByProjectKeyRequestBuilder
-): Promise<void> {
-
-  const freeSampleSku:string = readConfiguration().freeSampleSku;
-  const freeSampleQuantity: number = readConfiguration().freeSampleQuantity;
-  const freeSampleInventoryKey = "free-sample-" + freeSampleSku;
   
   const {
     body: { results: inventories },
@@ -81,14 +76,14 @@ export async function addInventory(
     )
     .execute();
   } else {
-      await createChannel().then(channelId => apiRoot
+      await createChannel(apiRoot).then(channelId => apiRoot
         .inventory()
         .post(
           {
             body: {
               sku: freeSampleSku,
               quantityOnStock: freeSampleQuantity,
-              supplyChannel: {typeId: "channel", id: channelId},
+              supplyChannel: {typeId: "channel", id: channel.id},
               key: freeSampleInventoryKey
             }
           }
@@ -228,4 +223,3 @@ export async function createCustomCartDiscountType(
     })
     .execute();
 }
-export const channelId = createChannel();

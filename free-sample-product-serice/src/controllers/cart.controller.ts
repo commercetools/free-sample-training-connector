@@ -3,9 +3,9 @@ import { UpdateAction } from '@commercetools/sdk-client-v2';
 import { createApiRoot } from '../client/create.client';
 import CustomError from '../errors/custom.error';
 import { Resource } from '../interfaces/resource.interface';
-import { GraphQLResponse, LineItem} from '@commercetools/platform-sdk';
+import { ApiRoot, GraphQLResponse, LineItem} from '@commercetools/platform-sdk';
 import { readConfiguration } from '../utils/config.utils';
-import {channelId} from '../connector/actions'
+import { log } from 'console';
 
 /**
  * Handle the update action
@@ -14,12 +14,12 @@ import {channelId} from '../connector/actions'
  * @returns {object}
  */
 const update = async (resource: Resource) => {
-  let productId = undefined;
+  let apiRoot = createApiRoot();
   const freeSampleSku:string = readConfiguration().freeSampleSku;
   const freeSampleChannel:string = readConfiguration().freeSampleChannel
   try {
     const updateActions: Array<UpdateAction> = [];
-    const freeLineItemKey: string = "free-sample-line-item"
+    const freeLineItemKey: string = "free-sample-line-item";
 
     const cart = JSON.parse(JSON.stringify(resource));
     if (cart.obj.lineItems.length !== 0) {
@@ -27,11 +27,26 @@ const update = async (resource: Resource) => {
 
       var freeItemFound: boolean = cart.obj.lineItems.some(
         (lineItem: LineItem) => lineItem.key === freeLineItemKey);
-      var cartEligible: boolean = cart.obj.centAmount >= 5000;
+      var cartEligible: boolean = cart.obj.totalPrice.centAmount >= 5000;
       
       if (cartEligible && !freeItemFound) {
-        const query: string = 'query checkProductAvailabilityByChannelAndSku($channelId: String, $sku: String) {products(skus: [$sku]) {results {masterData {current {allVariants {availability {channels(includeChannelIds: [$channelId]) {results {availability {availableQuantity}}}}}}}}}}';
-        const graphQLResponse: GraphQLResponse = await createApiRoot().graphql()
+        var channelQuery: string = 'query ($channelKey: String) { channel (key: $channelKey) {id}}';
+        var channelId = await apiRoot
+          .graphql()
+          .post({
+            body:{
+              query: channelQuery,
+              variables: {
+                channelKey: freeSampleChannel
+              }
+            }})
+          .execute().then(response => response.body.data.channel.id);
+
+        log("Channel Id", channelId);
+        
+        const query: string = 'query ($channelId: String, $sku: String) {products(skus: [$sku]) {results {masterData {current {variant (sku: $sku) {availability {channels(includeChannelIds: [$channelId]) {results {availability {availableQuantity}}}}}}}}}}';
+        const graphQLResponse = await apiRoot
+        .graphql()
         .post({
           body:{
             query,
@@ -40,9 +55,9 @@ const update = async (resource: Resource) => {
               sku: freeSampleSku
             }
           }})
-        .execute().then(response => response.body);
-
-        var availableQuantity: number = graphQLResponse.data.products.results[0].masterData.current.allVariants[0].availability.channels.results[0].availability.availableQuantity;
+        .execute().then(response => response.body.data);
+            log("GraphQL Response",graphQLResponse);
+        var availableQuantity: number = graphQLResponse.products.results[0].masterData.current.variant.availability.channels.results[0].availability.availableQuantity;
 
         const freeSampleAvailable: boolean = availableQuantity > 0;
         
