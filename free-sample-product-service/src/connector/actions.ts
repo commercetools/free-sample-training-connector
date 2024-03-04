@@ -1,9 +1,6 @@
 import { ByProjectKeyRequestBuilder } from '@commercetools/platform-sdk/dist/declarations/src/generated/client/by-project-key-request-builder';
 import { readConfiguration } from '../utils/config.utils';
 import { ApiRoot, Channel } from '@commercetools/platform-sdk';
-import { createApiRoot } from '../client/create.client';
-import { channel } from 'diagnostics_channel';
-import { response } from 'express';
 
 
 const CART_UPDATE_EXTENSION_KEY = 'free-sample-cartUpdateExtension';
@@ -15,7 +12,7 @@ export async function createChannelAndInventory(
   apiRoot: ByProjectKeyRequestBuilder
 ): Promise<void> {
 
-  const freeSampleChannelKey:string = readConfiguration().freeSampleChannel;
+  const freeSampleChannelKey:string = "free-sample-channel";
   const freeSampleSku:string = readConfiguration().freeSampleSku;
   const freeSampleQuantity: number = readConfiguration().freeSampleQuantity;
   const freeSampleInventoryKey = "free-sample-" + freeSampleSku;
@@ -31,6 +28,7 @@ export async function createChannelAndInventory(
       },
     })
     .execute();
+    console.log("Channel Created:", channels.length);
 
   if (channels.length > 0) {
     channel = channels[0];
@@ -47,6 +45,7 @@ export async function createChannelAndInventory(
         },
       })
       .execute().then(channel => channel.body);
+      console.log("Channel Created:", channel.id);
   }
   
   const {
@@ -76,7 +75,7 @@ export async function createChannelAndInventory(
     )
     .execute();
   } else {
-      await createChannel(apiRoot).then(channelId => apiRoot
+      await apiRoot
         .inventory()
         .post(
           {
@@ -88,7 +87,7 @@ export async function createChannelAndInventory(
             }
           }
         )
-        .execute())
+        .execute();
   }
 }
 

@@ -1,7 +1,7 @@
 deployAs:
-  - name: free-sample-product-serice
+  - name: free-sample-product-service
     applicationType: service
-    endpoint: /free-sample-product-serice
+    endpoint: /free-sample-product-service
     scripts:
       postDeploy: npm install && npm run build && npm run connector:post-deploy
       preUndeploy: npm install && npm run build && npm run connector:pre-undeploy
@@ -11,9 +11,6 @@ deployAs:
           description: commercetools Composable Commerce API region
           required: true
           default: "europe-west1.gcp"
-        - key: CTP_CHANNEL
-          description: Channel Key to manage the Inventory for the free item
-          required: true
         - key: CTP_QUANTITY
           description: Limit of free items
           required: true

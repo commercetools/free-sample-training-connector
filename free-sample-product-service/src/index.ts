@@ -27,7 +27,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 // Define routes
-app.use('/free-sample-product-serice', ServiceRoutes);
+app.use('/free-sample-product-service', ServiceRoutes);
 
 // Global error handler
 app.use(errorMiddleware);
