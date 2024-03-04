@@ -29,7 +29,7 @@ const update = async (resource: Resource) => {
 
       var freeItemFound: boolean = cart.obj.lineItems.some(
         (lineItem: LineItem) => lineItem.key === freeLineItemKey);
-      var cartEligible: boolean = cart.obj.totalPrice.centAmount >= minCartValue;
+      var cartEligible: boolean = cart.obj.totalPrice.centAmount >= (minCartValue * 100);
       
       if (cartEligible && !freeItemFound) {
         var channelQuery: string = 'query ($channelKey: String) { channel (key: $channelKey) {id}}';
