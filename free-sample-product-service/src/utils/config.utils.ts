@@ -16,9 +16,9 @@ export const readConfiguration = () => {
     projectKey: process.env.CTP_PROJECT_KEY as string,
     scope: process.env.CTP_SCOPE as string,
     region: process.env.CTP_REGION as string,
-    freeSampleChannel: process.env.CTP_CHANNEL as string,
-    freeSampleQuantity: parseInt(process.env.CTP_QUANTITY || ''),
-    freeSampleSku:process.env.CTP_SKU as string
+    freeSampleQuantity: parseInt(process.env.SAMPLE_PRODUCT_QUANTITY || ''),
+    freeSampleSku:process.env.SAMPLE_PRODUCT_SKU as string,
+    minCartValue: parseInt(process.env.CART_MIN_VALUE || ''),
   };
 
   const validationErrors = getValidateMessages(envValidators, envVars);

@@ -16,6 +16,7 @@ import { log } from 'console';
 const update = async (resource: Resource) => {
   let apiRoot = createApiRoot();
   const freeSampleSku:string = readConfiguration().freeSampleSku;
+  const minCartValue: number = readConfiguration().minCartValue;
   const freeSampleChannel:string = "free-sample-channel";
   try {
     const updateActions: Array<UpdateAction> = [];
@@ -28,7 +29,7 @@ const update = async (resource: Resource) => {
 
       var freeItemFound: boolean = cart.obj.lineItems.some(
         (lineItem: LineItem) => lineItem.key === freeLineItemKey);
-      var cartEligible: boolean = cart.obj.totalPrice.centAmount >= 2 0000;
+      var cartEligible: boolean = cart.obj.totalPrice.centAmount >= minCartValue;
       
       if (cartEligible && !freeItemFound) {
         var channelQuery: string = 'query ($channelKey: String) { channel (key: $channelKey) {id}}';

@@ -4,7 +4,7 @@ export interface Config {
   projectKey: string;
   scope: string;
   region: string;
-  freeSampleChannel: string;
   freeSampleQuantity: number;
+  minCartValue: number;
   freeSampleSku: string;
 }

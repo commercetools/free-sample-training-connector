@@ -11,11 +11,14 @@ deployAs:
           description: commercetools Composable Commerce API region
           required: true
           default: "europe-west1.gcp"
-        - key: CTP_QUANTITY
+        - key: SAMPLE_PRODUCT_QUANTITY
           description: Limit of free items
           required: true
-        - key: CTP_SKU
+        - key: SAMPLE_PRODUCT_SKU
           description: SKU of the free variant
+          required: true
+        - key: CART_MIN_VALUE
+          description: Minimum value of the cart
           required: true
       securedConfiguration:
         - key: CTP_PROJECT_KEY
