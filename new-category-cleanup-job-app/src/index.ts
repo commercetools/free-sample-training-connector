@@ -22,7 +22,7 @@ const app: Express = express();
 app.disable('x-powered-by');
 
 // Define routes
-app.use('/nd-connector-job-app', JobRoutes);
+app.use('/new-category-cleanup-job-app', JobRoutes);
 
 // Global error handler
 app.use(errorMiddleware);

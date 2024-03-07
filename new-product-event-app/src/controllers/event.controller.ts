@@ -47,14 +47,15 @@ export const post = async (request: Request, response: Response) => {
   if (!productId) {
     throw new CustomError(
       400,
-      'Bad request: No order id in the Pub/Sub message'
+      'Bad request: No product id in the Pub/Sub message'
     );
   }
 
   try {
+    const envVars =  readConfiguration();
     let apiRoot = createApiRoot();
     const categoryKey:string = readConfiguration().categoryKey;
-
+    
     const categoryId: string = await createApiRoot()
           .categories()
           .withKey({key: categoryKey})
