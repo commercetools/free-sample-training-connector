@@ -36,7 +36,6 @@ export const post = async (request: Request, response: Response) => {
     ? Buffer.from(pubSubMessage, 'base64').toString().trim()
     : undefined;
   
-  logger.info("Decoded: " + decodedData)
   if (decodedData) {
     const jsonData = JSON.parse(decodedData);
 
@@ -90,10 +89,6 @@ export const post = async (request: Request, response: Response) => {
               }
             })
             .execute();
-        }
-        else
-        {
-          logger.info("Product is already in the category or not new");
         }
       })
   }

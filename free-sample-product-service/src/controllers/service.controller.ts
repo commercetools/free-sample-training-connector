@@ -26,7 +26,6 @@ export const post = async (request: Request, response: Response) => {
     case 'cart':
       try {
         const data = await cartController(action, resource);
-    console.log("service controller");
         if (data && data.statusCode === 200) {
           apiSuccess(200, data.actions, response);
           return;

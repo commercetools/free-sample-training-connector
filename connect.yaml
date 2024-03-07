@@ -15,7 +15,7 @@ deployAs:
           description: Limit of free items
           required: true
         - key: SAMPLE_PRODUCT_SKU
-          description: SKU of the free variant
+          description: SKU of the free product
           required: true
         - key: CART_MIN_VALUE
           description: Minimum value of the cart
@@ -45,7 +45,7 @@ deployAs:
           description: commercetools Composable Commerce API region
           default: europe-west1.gcp
         - key: NEW_CATEGORY_KEY
-          description: The id of the Category used for new arrivals
+          description: The key of the Category used for new arrivals
           required: true
       securedConfiguration:
         - key: CTP_PROJECT_KEY
@@ -70,7 +70,7 @@ deployAs:
           description: commercetools Composable Commerce API region
           default: europe-west1.gcp
         - key: NEW_CATEGORY_KEY
-          description: The id of the Category used for new arrivals
+          description: The key of the Category used for new arrivals
           required: true
       securedConfiguration:
         - key: CTP_PROJECT_KEY

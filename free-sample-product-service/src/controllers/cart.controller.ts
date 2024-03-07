@@ -63,6 +63,7 @@ const update = async (resource: Resource) => {
             sku: freeSampleSku,
             key: freeLineItemKey,
             supplyChannel: {typeId: "channel", key: freeSampleChannel},
+            inventoryMode: "ReserveOnOrder",
             externalTotalPrice: {
               price: {
                 currencyCode: cartCurrency,

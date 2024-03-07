@@ -27,8 +27,6 @@ export const post = async (_request: Request, response: Response) => {
     const today = new Date();
     const toDate = new Date(new Date().setDate(today.getDate() - 30));
 
-    logger.info(`Checking Products created before ${toDate.toDateString()} in category: ${categoryId}`);
-
     // Filter query used by Product Projection Search
     const filterQuery:string[] = [
       `categories.id:"${categoryId}"`,
@@ -37,9 +35,6 @@ export const post = async (_request: Request, response: Response) => {
 
     const productsInCategory = await getProductsInCategory(filterQuery);
 
-    logger.info(`Found ${productsInCategory.results.length} Products.`);
-
-    
     for (const product of productsInCategory.results)
     {
       await removeCategoryFromProduct(product.id, product.version, categoryId);
