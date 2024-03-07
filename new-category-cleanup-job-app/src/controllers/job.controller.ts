@@ -22,7 +22,7 @@ export const post = async (_request: Request, response: Response) => {
     const categoryId: string = await createApiRoot()
                                   .categories()
                                   .withKey({key: categoryKey})
-                                  .get().execute().then(categoryResponse => categoryResponse.body.id);
+                                  .get().execute().then(({body}) => body.id);
                                   
     const today = new Date();
     const toDate = new Date(new Date().setDate(today.getDate() - 30));

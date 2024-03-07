@@ -60,34 +60,41 @@ export const post = async (request: Request, response: Response) => {
     const categoryId: string = await createApiRoot()
           .categories()
           .withKey({key: categoryKey})
-          .get().execute().then(categoryResponse => categoryResponse.body.id);
+          .get().execute().then(({body}) => body.id);
 
-    logger.info("Category ID: ", categoryId);
-    const product = await apiRoot
+    await apiRoot
       .productProjections()
       .withId({ ID: productId })
       .get()
-      .execute();
-    logger.info("Product Key: ", product.body.key);
-    // Execute the tasks in need
-    
-    if (product.body.categories?.find(category => category.id === categoryId) == undefined)
-    {
-      await apiRoot.products()
-        .withId({ID: productId})
-        .post({
-          body: {
-            version: product.body.version,
-            actions: [{
-              action: "addToCategory",
-              category: {typeId: "category", id: categoryId}
-            }]
-          }
-        })
-        .execute();
-    }
-    else logger.info("Product is already in the category:",product.body.categories?.find(category => category.id === categoryId)?.id);
-  } 
+      .execute()
+      .then(({body}) => {
+        const createdAt = new Date(body.createdAt);
+        const today = new Date();
+        const fromDate = new Date(new Date().setDate(today.getDate() - 30));
+        if((createdAt >= fromDate) && (body.categories?.find(category => category.id === categoryId) == undefined))
+        {
+          apiRoot.products()
+            .withId({ID: body.id})
+            .post({
+              body: {
+                version: body.version,
+                actions: [{
+                  action: "addToCategory",
+                  category: {typeId: "category", id: categoryId}
+                },
+                {
+                  action: "publish"    
+                }]
+              }
+            })
+            .execute();
+        }
+        else
+        {
+          logger.info("Product is already in the category");
+        }
+      })
+  }
   catch (error) {
     throw new CustomError(400, `Bad request: ${error}`);
   }
