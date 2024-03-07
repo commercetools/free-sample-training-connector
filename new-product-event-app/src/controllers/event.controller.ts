@@ -56,21 +56,23 @@ export const post = async (request: Request, response: Response) => {
   try {
     let apiRoot = createApiRoot();
     const categoryKey:string = readConfiguration().categoryKey;
-    
+
     const categoryId: string = await createApiRoot()
           .categories()
           .withKey({key: categoryKey})
           .get().execute().then(({body}) => body.id);
-
+    
     await apiRoot
       .productProjections()
       .withId({ ID: productId })
       .get()
       .execute()
       .then(({body}) => {
+        
         const createdAt = new Date(body.createdAt);
         const today = new Date();
         const fromDate = new Date(new Date().setDate(today.getDate() - 30));
+        
         if((createdAt >= fromDate) && (body.categories?.find(category => category.id === categoryId) == undefined))
         {
           apiRoot.products()
@@ -91,7 +93,7 @@ export const post = async (request: Request, response: Response) => {
         }
         else
         {
-          logger.info("Product is already in the category");
+          logger.info("Product is already in the category or not new");
         }
       })
   }

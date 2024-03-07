@@ -63,7 +63,7 @@ deployAs:
     applicationType: job
     endpoint: /new-category-cleanup-job-app
     properties:
-      schedule: "*/5 * * * *"
+      schedule: "0 1 * * *"
     configuration:
       standardConfiguration:
         - key: CTP_REGION
