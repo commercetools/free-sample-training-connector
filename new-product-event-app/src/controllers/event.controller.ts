@@ -29,19 +29,21 @@ export const post = async (request: Request, response: Response) => {
 
   // Receive the Pub/Sub message
   const pubSubMessage = request.body.message.data;
-  logger.info("Raw data:",JSON.stringify(pubSubMessage));
+
   // For our example we will use the customer id as a var
   // and the query the commercetools sdk with that info
   const decodedData = pubSubMessage
     ? Buffer.from(pubSubMessage, 'base64').toString().trim()
     : undefined;
+  
   logger.info("Decoded: " + decodedData)
   if (decodedData) {
     const jsonData = JSON.parse(decodedData);
 
+    if (jsonData.resource.typeId == "subscription"){
+      response.status(204).send();
+    }
     productId = jsonData.resource.id;
-
-    logger.info("Product Resource ID:" + jsonData.resource.id);
   }
 
   if (!productId) {
@@ -52,7 +54,6 @@ export const post = async (request: Request, response: Response) => {
   }
 
   try {
-    const envVars =  readConfiguration();
     let apiRoot = createApiRoot();
     const categoryKey:string = readConfiguration().categoryKey;
     
@@ -69,8 +70,25 @@ export const post = async (request: Request, response: Response) => {
       .execute();
     logger.info("Product Key: ", product.body.key);
     // Execute the tasks in need
-    logger.info(product.body.categories?.find(category => category.id === categoryId)?.id);
-  } catch (error) {
+    
+    if (product.body.categories?.find(category => category.id === categoryId) == undefined)
+    {
+      await apiRoot.products()
+        .withId({ID: productId})
+        .post({
+          body: {
+            version: product.body.version,
+            actions: [{
+              action: "addToCategory",
+              category: {typeId: "category", id: categoryId}
+            }]
+          }
+        })
+        .execute();
+    }
+    else logger.info("Product is already in the category:",product.body.categories?.find(category => category.id === categoryId)?.id);
+  } 
+  catch (error) {
     throw new CustomError(400, `Bad request: ${error}`);
   }
 
