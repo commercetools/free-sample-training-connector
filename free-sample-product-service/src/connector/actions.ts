@@ -1,10 +1,9 @@
 import { ByProjectKeyRequestBuilder } from '@commercetools/platform-sdk/dist/declarations/src/generated/client/by-project-key-request-builder';
 import { readConfiguration } from '../utils/config.utils';
-import { ApiRoot, Channel } from '@commercetools/platform-sdk';
+import { Channel } from '@commercetools/platform-sdk';
 
 
 const CART_UPDATE_EXTENSION_KEY = 'free-sample-cartUpdateExtension';
-const CART_DISCOUNT_TYPE_KEY = 'myconnector-cartDiscountType';
 
   
 
@@ -12,7 +11,7 @@ export async function createChannelAndInventory(
   apiRoot: ByProjectKeyRequestBuilder
 ): Promise<void> {
 
-  const freeSampleChannelKey:string = "free-sample-channel";
+  const freeSampleChannelKey:string = readConfiguration().freeSampleChannelKey;
   const freeSampleSku:string = readConfiguration().freeSampleSku;
   const freeSampleQuantity: number = readConfiguration().freeSampleQuantity;
   const freeSampleInventoryKey = "free-sample-" + freeSampleSku;
@@ -28,7 +27,6 @@ export async function createChannelAndInventory(
       },
     })
     .execute();
-    console.log("Channel Created:", channels.length);
 
   if (channels.length > 0) {
     channel = channels[0];
@@ -60,7 +58,7 @@ export async function createChannelAndInventory(
     .execute();
 
   if (inventories.length > 0) {
-    var inventory = inventories[0];
+    let inventory = inventories[0];
     await apiRoot
     .inventory()
     .withId({ID: inventory.id})
@@ -140,6 +138,64 @@ export async function createCartUpdateExtension(
     .execute();
 }
 
+export async function deleteChannelAndInventory(
+  apiRoot: ByProjectKeyRequestBuilder
+): Promise<void> {
+
+  const freeSampleChannelKey:string = readConfiguration().freeSampleChannelKey;
+  const freeSampleSku:string = readConfiguration().freeSampleSku;
+  const freeSampleInventoryKey = "free-sample-" + freeSampleSku;
+  let channel: Channel;
+  
+  const {
+    body: { results: channels },
+  } = await apiRoot
+    .channels()
+    .get({
+      queryArgs: {
+        where: `key = "${freeSampleChannelKey}"`,
+      },
+    })
+    .execute();
+
+  if (channels.length > 0) {
+    channel = channels[0];
+  
+    const {
+      body: { results: inventories },
+    } = await apiRoot
+      .inventory()
+      .get({
+        queryArgs: {
+          where: `key = "${freeSampleInventoryKey}"`,
+        }
+      })
+      .execute();
+
+    if (inventories.length > 0) {
+      let inventory = inventories[0];
+      await apiRoot
+      .inventory()
+      .withId({ID: inventory.id})
+      .delete(
+        {queryArgs: {
+          version: inventory.version,
+        }}
+      )
+      .execute();
+    }
+    await apiRoot
+      .channels()
+      .withId({ID: channel.id})
+      .delete(
+        {queryArgs: {
+          version: channel.version,
+        }}
+      )
+      .execute();
+  }
+}
+
 export async function deleteCartUpdateExtension(
   apiRoot: ByProjectKeyRequestBuilder
 ): Promise<void> {
@@ -167,58 +223,4 @@ export async function deleteCartUpdateExtension(
       })
       .execute();
   }
-}
-
-export async function createCustomCartDiscountType(
-  apiRoot: ByProjectKeyRequestBuilder
-): Promise<void> {
-  const {
-    body: { results: types },
-  } = await apiRoot
-    .types()
-    .get({
-      queryArgs: {
-        where: `key = "${CART_DISCOUNT_TYPE_KEY}"`,
-      },
-    })
-    .execute();
-
-  if (types.length > 0) {
-    const type = types[0];
-
-    await apiRoot
-      .types()
-      .withKey({ key: CART_DISCOUNT_TYPE_KEY })
-      .delete({
-        queryArgs: {
-          version: type.version,
-        },
-      })
-      .execute();
-  }
-
-  await apiRoot
-    .types()
-    .post({
-      body: {
-        key: CART_DISCOUNT_TYPE_KEY,
-        name: {
-          en: 'Custom type to store a string',
-        },
-        resourceTypeIds: ['cart-discount'],
-        fieldDefinitions: [
-          {
-            type: {
-              name: 'String',
-            },
-            name: 'customCartField',
-            label: {
-              en: 'Custom cart field',
-            },
-            required: false,
-          },
-        ],
-      },
-    })
-    .execute();
 }

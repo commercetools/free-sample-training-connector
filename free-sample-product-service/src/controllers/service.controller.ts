@@ -42,11 +42,6 @@ export const post = async (request: Request, response: Response) => {
       }
 
       break;
-    case 'payment':
-      break;
-
-    case 'order':
-      break;
 
     default:
       throw new CustomError(

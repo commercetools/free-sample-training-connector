@@ -14,7 +14,6 @@ export const readConfiguration = () => {
     clientId: process.env.CTP_CLIENT_ID as string,
     clientSecret: process.env.CTP_CLIENT_SECRET as string,
     projectKey: process.env.CTP_PROJECT_KEY as string,
-    scope: process.env.CTP_SCOPE as string,
     region: process.env.CTP_REGION as string,
     categoryKey: process.env.NEW_CATEGORY_KEY as string,
   };

@@ -17,10 +17,10 @@ const update = async (resource: Resource) => {
   let apiRoot = createApiRoot();
   const freeSampleSku:string = readConfiguration().freeSampleSku;
   const minCartValue: number = readConfiguration().minCartValue;
-  const freeSampleChannel:string = "free-sample-channel";
+  const freeSampleChannel:string = readConfiguration().freeSampleChannelKey;
   try {
     const updateActions: Array<UpdateAction> = [];
-    const freeLineItemKey: string = "free-sample-line-item";
+    const freeLineItemKey: string = readConfiguration().freeLineItemKey;
 
     const cart = JSON.parse(JSON.stringify(resource));
     if (cart.obj.lineItems.length !== 0) {
@@ -29,7 +29,7 @@ const update = async (resource: Resource) => {
 
       var freeItemFound: boolean = cart.obj.lineItems.some(
         (lineItem: LineItem) => lineItem.key === freeLineItemKey);
-      var cartEligible: boolean = cart.obj.totalPrice.centAmount >= (minCartValue * 100);
+      var cartEligible: boolean = cart.obj.totalPrice.centAmount >= (minCartValue);
       
       if (cartEligible && !freeItemFound) {
         var channelQuery: string = 'query ($channelKey: String) { channel (key: $channelKey) {id}}';

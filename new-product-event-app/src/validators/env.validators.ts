@@ -1,5 +1,4 @@
 import {
-  optional,
   standardString,
   standardKey,
   region,
@@ -34,16 +33,6 @@ const envValidators = [
     message: 'Project key should be a valid string.',
     referencedBy: 'environmentVariables',
   }),
-
-  optional(standardString)(
-    ['scope'],
-    {
-      code: 'InvalidScope',
-      message: 'Scope should be at least 2 characters long.',
-      referencedBy: 'environmentVariables',
-    },
-    { min: 2, max: undefined }
-  ),
 
   region(['region'], {
     code: 'InvalidRegion',
