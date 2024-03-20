@@ -12,6 +12,9 @@ This Connector is to be used in self-learning training modules only. It contains
 2. an event app that manages products in new arrivals 
 3. a cleanup job app that runs daily to remove products from the new arrivals category after 30 days
 
+
+![Sample Connector Diagram](docs/images/sample-connector.png "Sample Connector")
+
 ## Prerequisite
 
 - commercetools Composable Commerce account
@@ -26,7 +29,9 @@ Take note of the following:
 
 ## How to Install
 
-Deploy this demo Connector into any project to learn and experience how commercetools Connect makes integrations quick and easy. This Connector contains three applications, each of a different type.
+Deploy this demo Connector into any project to learn and experience how commercetools Connect makes integrations quick and easy. Follow the steps from the [commercetools connect deployment documentation](https://docs.commercetools.com/connect/concepts#deployments).
+
+This Connector contains three applications, each of a different type.
 
 ### free-sample-product-service
 
@@ -56,3 +61,7 @@ Configurations:
 
 1. Category key for new arrivals
 2. API credentials
+
+## How to Uninstall
+
+In order to uninstall the connector, either send a DELETE [using API](https://docs.commercetools.com/connect/deployments#delete-deployment) or simply [uninstall it from the Merchant Center](https://docs.commercetools.com/merchant-center/connect#uninstall-a-connector).
