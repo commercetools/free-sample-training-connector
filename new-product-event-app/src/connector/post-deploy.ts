@@ -1,7 +1,6 @@
 import dotenv from 'dotenv';
 dotenv.config();
 
-import { createApiRoot } from '../client/create.client';
 import { assertError, assertString } from '../utils/assert.utils';
 import { createProductPublishedSubscription } from './actions';
 
@@ -15,11 +14,10 @@ async function postDeploy(properties: Map<string, unknown>): Promise<void> {
   assertString(topicName, CONNECT_GCP_TOPIC_NAME_KEY);
   assertString(projectId, CONNECT_GCP_PROJECT_ID_KEY);
 
-  const apiRoot = createApiRoot();
-  await createProductPublishedSubscription(apiRoot, topicName, projectId);
+  await createProductPublishedSubscription(topicName, projectId);
 }
 
-async function run(): Promise<void> {
+export async function run(): Promise<void> {
   try {
     const properties = new Map(Object.entries(process.env));
     await postDeploy(properties);

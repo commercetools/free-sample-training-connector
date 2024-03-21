@@ -1,15 +1,14 @@
 import { ByProjectKeyRequestBuilder } from '@commercetools/platform-sdk/dist/declarations/src/generated/client/by-project-key-request-builder';
 import { readConfiguration } from '../utils/config.utils';
 import { Channel } from '@commercetools/platform-sdk';
+import { createApiRoot } from '../client/create.client';
 
 
 const CART_UPDATE_EXTENSION_KEY = 'free-sample-cartUpdateExtension';
 
   
 
-export async function createChannelAndInventory(
-  apiRoot: ByProjectKeyRequestBuilder
-): Promise<void> {
+export async function createChannelAndInventory(): Promise<void> {
 
   const freeSampleChannelKey:string = readConfiguration().freeSampleChannelKey;
   const freeSampleSku:string = readConfiguration().freeSampleSku;
@@ -17,6 +16,8 @@ export async function createChannelAndInventory(
   const freeSampleInventoryKey = "free-sample-" + freeSampleSku;
   let channel: Channel;
   
+  const apiRoot = createApiRoot();
+
   const {
     body: { results: channels },
   } = await apiRoot
@@ -90,9 +91,11 @@ export async function createChannelAndInventory(
 }
 
 export async function createCartUpdateExtension(
-  apiRoot: ByProjectKeyRequestBuilder,
   applicationUrl: string
 ): Promise<void> {
+  
+  const apiRoot = createApiRoot();
+
   const {
     body: { results: extensions },
   } = await apiRoot
@@ -138,15 +141,15 @@ export async function createCartUpdateExtension(
     .execute();
 }
 
-export async function deleteChannelAndInventory(
-  apiRoot: ByProjectKeyRequestBuilder
-): Promise<void> {
+export async function deleteChannelAndInventory(): Promise<void> {
 
   const freeSampleChannelKey:string = readConfiguration().freeSampleChannelKey;
   const freeSampleSku:string = readConfiguration().freeSampleSku;
   const freeSampleInventoryKey = "free-sample-" + freeSampleSku;
   let channel: Channel;
   
+  const apiRoot = createApiRoot();
+
   const {
     body: { results: channels },
   } = await apiRoot
@@ -196,9 +199,10 @@ export async function deleteChannelAndInventory(
   }
 }
 
-export async function deleteCartUpdateExtension(
-  apiRoot: ByProjectKeyRequestBuilder
-): Promise<void> {
+export async function deleteCartUpdateExtension(): Promise<void> {
+  
+  const apiRoot = createApiRoot();
+
   const {
     body: { results: extensions },
   } = await apiRoot

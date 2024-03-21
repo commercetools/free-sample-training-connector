@@ -1,13 +1,14 @@
 import { ByProjectKeyRequestBuilder } from '@commercetools/platform-sdk/dist/declarations/src/generated/client/by-project-key-request-builder';
+import { createApiRoot } from '../client/create.client';
 
 const PRODUCT_PUBLISHED_SUBSCRIPTION_KEY =
   'ProductPublishedSubscription';
 
 export async function createProductPublishedSubscription(
-  apiRoot: ByProjectKeyRequestBuilder,
   topicName: string,
   projectId: string
 ): Promise<void> {
+  const apiRoot = createApiRoot();
   const {
     body: { results: subscriptions },
   } = await apiRoot
@@ -55,8 +56,10 @@ export async function createProductPublishedSubscription(
 }
 
 export async function deleteProductPublishedSubscription(
-  apiRoot: ByProjectKeyRequestBuilder
 ): Promise<void> {
+  
+  const apiRoot = createApiRoot();
+
   const {
     body: { results: subscriptions },
   } = await apiRoot

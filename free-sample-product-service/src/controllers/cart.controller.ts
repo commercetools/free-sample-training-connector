@@ -109,8 +109,6 @@ const update = async (resource: Resource) => {
   }
 };
 
-
-
 /**
  * Handle the cart controller according to the action
  *
