@@ -8,8 +8,8 @@ import { getCategoryByKey } from '../api/categories';
 // Mocking dependencies
 jest.mock('../utils/config.utils');
 jest.mock('../utils/logger.utils');
-jest.mock('../products/fetch.products');
-jest.mock('../categories/categories');
+jest.mock('../api/fetch.products');
+jest.mock('../api/categories');
 
 describe('Job Controller', () => {
     let req: Request;

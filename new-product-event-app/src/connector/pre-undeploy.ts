@@ -13,7 +13,7 @@ export async function run(): Promise<void> {
     await preUndeploy();
   } catch (error) {
     assertError(error);
-    process.stderr.write(`Post-undeploy failed: ${error.message}\n`);
+    process.stderr.write(`Pre-undeploy failed: ${error.message}`);
     process.exitCode = 1;
   }
 }
