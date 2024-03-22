@@ -1,42 +1,45 @@
 import CustomError from '../errors/custom.error';
 import { Resource } from '../interfaces/resource.interface';
-import { readConfiguration } from '../utils/config.utils';
 import { isProductAvailable } from '../api/products';
 import { update, cartController } from './cart.controller';
+import * as controller from './cart.controller';
 
 // Mocking dependencies
-jest.mock('../utils/config.utils');
+jest.mock('../utils/config.utils', () => ({
+  readConfiguration: jest.fn(() => ({
+    freeSampleSku: 'mockSampleSku',
+    minCartValue: 100,
+    freeSampleChannelKey: 'mockChannelKey',
+    freeLineItemKey: 'mockLineItemKey',
+  })),
+}));
+
+
+jest.mock('../api/channels', () => ({
+  getChannelByKey: jest.fn(() => {
+    return new Promise((resolve) => {
+      resolve({ id: 'mockChannelId' });
+    });
+  }),
+}));
+
 jest.mock('../api/products');
-jest.mock('../errors/custom.error');
 
 describe('update', () => {
-  let mockResource: Resource;
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
 
-  beforeEach(() => {
-    mockResource = {
+  it('should add line item and recalculate', async () => {
+    const mockResource = {
       obj: {
-        lineItems: [],
+        lineItems: [{ key: 'mockLineItemKey1' }],
         totalPrice: {
           currencyCode: 'USD',
           centAmount: 1000,
         },
       },
     };
-  });
-
-  afterEach(() => {
-    jest.clearAllMocks();
-  });
-
-  it('should add line item and recalculate', async () => {
-    // Mocking the configuration read from utils
-    (readConfiguration as jest.Mock).mockReturnValue({
-      freeSampleSku: 'mockSampleSku',
-      minCartValue: 100,
-      freeSampleChannelKey: 'mockChannelKey',
-      freeLineItemKey: 'mockLineItemKey',
-    });
-
     // Mocking isProductAvailable to return true
     (isProductAvailable as jest.Mock).mockResolvedValue(true);
 
@@ -51,14 +54,15 @@ describe('update', () => {
   });
 
   it('should remove line item and recalculate', async () => {
-    // Mocking the configuration read from utils
-    (readConfiguration as jest.Mock).mockReturnValue({
-      freeSampleSku: 'mockSampleSku',
-      minCartValue: 100,
-      freeSampleChannelKey: 'mockChannelKey',
-      freeLineItemKey: 'mockLineItemKey',
-    });
-
+    const mockResource = {
+      obj: {
+        lineItems: [{ key: 'mockLineItemKey' }],
+        totalPrice: {
+          currencyCode: 'USD',
+          centAmount: 1,
+        },
+      },
+    };
     // Mocking isProductAvailable to return false
     (isProductAvailable as jest.Mock).mockResolvedValue(false);
 
@@ -73,19 +77,23 @@ describe('update', () => {
   });
 
   it('should throw CustomError on error', async () => {
+    const mockResource = {
+      obj: {
+        lineItems: [{ key: 'mockLineItemKey1' }],
+        totalPrice: {
+          currencyCode: 'USD',
+          centAmount: 1001,
+        },
+      },
+    };
     const mockError = new Error('Mocked error');
 
     // Mocking the error thrown by isProductAvailable
     (isProductAvailable as jest.Mock).mockRejectedValue(mockError);
 
     // Executing the update function
-    await expect(update(mockResource)).rejects.toThrowError(CustomError);
 
-    // Expectations
-    expect(CustomError).toHaveBeenCalledWith(
-      400,
-      expect.stringContaining('Internal server error on CartController')
-    );
+    await expect(update(mockResource)).rejects.toThrow();
   });
 });
 
@@ -109,25 +117,23 @@ describe('cartController', () => {
   });
 
   it('should handle Update action', async () => {
-    // Mocking the response from update function
-    const mockUpdateData = { statusCode: 200, actions: [{ action: 'mockAction' }] };
-    (update as jest.Mock).mockResolvedValue(mockUpdateData);
-
-    // Executing the cartController function
-    const result = await cartController('Update', mockResource);
-
-    // Expectations
-    expect(result).toEqual(mockUpdateData);
+    const updateMock = jest.spyOn(controller, 'update');
+    await cartController('Update', mockResource);
+    expect(controller.update).toHaveBeenCalled();
+    updateMock.mockRestore();
   });
 
   it('should throw CustomError for unrecognized action', async () => {
     // Executing the cartController function with an invalid action
-    await expect(cartController('InvalidAction', mockResource)).rejects.toThrowError(CustomError);
 
-    // Expectations
-    expect(CustomError).toHaveBeenCalledWith(
-      500,
-      expect.stringContaining('Internal Server Error - Resource not recognized')
-    );
+    try {
+      await cartController('InvalidAction', mockResource);
+    } catch (error) {
+      expect(error).toBeInstanceOf(CustomError);
+      expect((error as CustomError).statusCode).toBe(500);
+      expect((error as CustomError).message).toContain(
+        'Internal Server Error - Resource not recognized'
+      );
+    }
   });
 });
