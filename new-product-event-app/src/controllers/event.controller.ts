@@ -1,8 +1,9 @@
 import { Request, Response } from 'express';
-import { createApiRoot } from '../client/create.client';
 import CustomError from '../errors/custom.error';
 import { logger } from '../utils/logger.utils';
 import { readConfiguration } from '../utils/config.utils';
+import { getCategoryByKey } from '../api/categories';
+import { addCategoryToProductById, getProductById } from '../api/products';
 
 /**
  * Exposed event POST endpoint.
@@ -13,7 +14,7 @@ import { readConfiguration } from '../utils/config.utils';
  * @returns
  */
 export const post = async (request: Request, response: Response) => {
-  let productId = undefined;
+  let productId = '';
 
   // Check request body
   if (!request.body) {
@@ -53,42 +54,19 @@ export const post = async (request: Request, response: Response) => {
   }
 
   try {
-    let apiRoot = createApiRoot();
     const categoryKey:string = readConfiguration().categoryKey;
 
-    const categoryId: string = await createApiRoot()
-          .categories()
-          .withKey({key: categoryKey})
-          .get().execute().then(({body}) => body.id);
+    const categoryId: string = await getCategoryByKey(categoryKey).then(({body}) => body.id);
     
-    await apiRoot
-      .productProjections()
-      .withId({ ID: productId })
-      .get()
-      .execute()
+    await getProductById(productId)
       .then(({body}) => {
-        
         const createdAt = new Date(body.createdAt);
         const today = new Date();
         const fromDate = new Date(new Date().setDate(today.getDate() - 30));
         
         if((createdAt >= fromDate) && (body.categories?.find(category => category.id === categoryId) == undefined))
         {
-          apiRoot.products()
-            .withId({ID: body.id})
-            .post({
-              body: {
-                version: body.version,
-                actions: [{
-                  action: "addToCategory",
-                  category: {typeId: "category", id: categoryId}
-                },
-                {
-                  action: "publish"    
-                }]
-              }
-            })
-            .execute();
+           addCategoryToProductById(productId, categoryId);
         }
       })
   }

@@ -3,8 +3,8 @@ import { Request, Response } from 'express';
 import { readConfiguration } from '../utils/config.utils';
 import CustomError from '../errors/custom.error';
 import { logger } from '../utils/logger.utils';
-import { getProductsInCategory, removeCategoryFromProduct } from '../products/fetch.products';
-import { createApiRoot } from '../client/create.client';
+import { getProductsInCategory, removeCategoryFromProduct } from '../api/fetch.products';
+import { getCategoryByKey } from '../api/categories';
 
 /**
  * Exposed job endpoint.
@@ -19,10 +19,7 @@ export const post = async (_request: Request, response: Response) => {
     logger.info(`Running job to remove Products from Category.`);
 
     const categoryKey:string =readConfiguration().categoryKey;
-    const categoryId: string = await createApiRoot()
-                                  .categories()
-                                  .withKey({key: categoryKey})
-                                  .get().execute().then(({body}) => body.id);
+    const categoryId: string = await getCategoryByKey(categoryKey).then(({body}) => body.id);
                                   
     const today = new Date();
     const toDate = new Date(new Date().setDate(today.getDate() - 30));

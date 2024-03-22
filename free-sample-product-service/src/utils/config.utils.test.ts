@@ -38,7 +38,7 @@ describe('readConfiguration', () => {
   });
 
   it('should throw a CustomError when env variables are invalid', () => {
-    process.env = mockEnv
+    process.env = mockEnv;
     // Mock the validation function to return validation errors
     jest.spyOn(validatorHelper, 'getValidateMessages').mockReturnValue(['Invalid variable: CTP_CLIENT_ID']);
 
