@@ -7,6 +7,13 @@ jest.mock('../utils/assert.utils', () => ({
   assertString: jest.fn(),
 }));
 
+jest.mock('../validators/helpers.validators', () => ({
+  getValidateMessages: jest.fn(() => []),
+}));
+
+jest.mock('../validators/env.validators', () => []);
+
+
 jest
   .spyOn(actions, 'createProductPublishedSubscription')
   .mockReturnValue(Promise.resolve());
