@@ -2,6 +2,13 @@ import { assertError } from '../utils/assert.utils';
 import * as preUndeploy from './pre-undeploy';
 import * as actions from './actions';
 
+jest.mock('../validators/helpers.validators', () => ({
+  getValidateMessages: jest.fn(() => []),
+}));
+
+
+jest.mock('../validators/env.validators', () => []);
+
 jest.mock('../utils/assert.utils', () => ({
   assertError: jest.fn(),
   assertString: jest.fn(),

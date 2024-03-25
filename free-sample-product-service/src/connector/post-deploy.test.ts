@@ -2,10 +2,18 @@ import { assertError } from '../utils/assert.utils';
 import * as postDeploy from './post-deploy';
 import * as actions from './actions';
 
+jest.mock('../validators/helpers.validators', () => ({
+  getValidateMessages: jest.fn(() => []),
+}));
+
+jest.mock('../validators/env.validators', () => []);
+
+
 jest.mock('../utils/assert.utils', () => ({
   assertError: jest.fn(),
   assertString: jest.fn(),
 }));
+
 
 jest
   .spyOn(actions, 'createChannelAndInventory')
