@@ -35,7 +35,7 @@ describe('run functions', () => {
     jest
       .spyOn(actions, 'createChannelAndInventory')
       .mockRejectedValueOnce(mockError);
-    
+
     jest
       .spyOn(actions, 'createCartUpdateExtension')
       .mockRejectedValueOnce(mockError);
@@ -58,7 +58,7 @@ describe('run functions', () => {
     jest
       .spyOn(actions, 'createChannelAndInventory')
       .mockRejectedValueOnce(mockError);
-    
+
     jest
       .spyOn(actions, 'createCartUpdateExtension')
       .mockRejectedValueOnce(mockError);
